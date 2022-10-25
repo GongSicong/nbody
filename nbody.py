@@ -9,6 +9,10 @@
 # modified by Andriy Misyura
 # slightly modified by bmmeijers
 
+# Last Modified by:
+# Authors: Gong Sicong
+# Studentnumbers: 5711932
+
 import sys
 from math import sqrt, pi as PI
 
