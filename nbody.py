@@ -20,7 +20,7 @@ from math import sqrt, pi as PI
 def combinations(l):
     result = []
     for x in range(len(l) - 1):
-        ls = l[x + 1 :]
+        ls = l[x + 1:]
         for y in ls:
             result.append((l[x][0], l[x][1], l[x][2], y[0], y[1], y[2]))
     return result
@@ -73,28 +73,6 @@ SYSTEM = tuple(BODIES.values())
 PAIRS = tuple(combinations(SYSTEM))
 
 
-def advance(dt, n, bodies=SYSTEM, pairs=PAIRS):
-    for i in range(n):
-        for ([x1, y1, z1], v1, m1, [x2, y2, z2], v2, m2) in pairs:
-            dx = x1 - x2
-            dy = y1 - y2
-            dz = z1 - z2
-            dist = sqrt(dx * dx + dy * dy + dz * dz)
-            mag = dt / (dist * dist * dist)
-            b1m = m1 * mag
-            b2m = m2 * mag
-            v1[0] -= dx * b2m
-            v1[1] -= dy * b2m
-            v1[2] -= dz * b2m
-            v2[2] += dz * b1m
-            v2[1] += dy * b1m
-            v2[0] += dx * b1m
-        for (r, [vx, vy, vz], m) in bodies:
-            r[0] += dt * vx
-            r[1] += dt * vy
-            r[2] += dt * vz
-
-
 def report_energy(bodies=SYSTEM, pairs=PAIRS, e=0.0):
     for ((x1, y1, z1), v1, m1, (x2, y2, z2), v2, m2) in pairs:
         dx = x1 - x2
@@ -117,19 +95,73 @@ def offset_momentum(ref, bodies=SYSTEM, px=0.0, py=0.0, pz=0.0):
     v[2] = pz / m
 
 
-def main(n, ref="sun"):
+import time
+
+list_name = ["sun", "jupiter", "saturn", "uranus", "neptune"]
+
+
+def advance(dt, bodies=SYSTEM, pairs=PAIRS):
+    for ([x1, y1, z1], v1, m1, [x2, y2, z2], v2, m2) in pairs:
+        dx = x1 - x2
+        dy = y1 - y2
+        dz = z1 - z2
+        dist = sqrt(dx * dx + dy * dy + dz * dz)
+        mag = dt / (dist * dist * dist)
+        b1m = m1 * mag
+        b2m = m2 * mag
+        v1[0] -= dx * b2m
+        v1[1] -= dy * b2m
+        v1[2] -= dz * b2m
+        v2[2] += dz * b1m
+        v2[1] += dy * b1m
+        v2[0] += dx * b1m
+    for (r, [vx, vy, vz], m) in bodies:
+        r[0] += dt * vx
+        r[1] += dt * vy
+        r[2] += dt * vz
+
+
+def write(n, output, bodies=SYSTEM):
+    if output:
+        file = open("result_python.csv", mode='a')
+        file.writelines("name of the body;position x;position y;position z;step\n")
+        for i in range(n):
+            for j, ([x, y, z], volcity, mass) in enumerate(bodies):
+                line = list_name[j] + ";" + str(x) + ";" + str(y) + ";" + str(z) + ";" + str(i) + "\n"
+                file.write(line)
+            advance(0.01)
+        file.close()
+    else:
+        for i in range(n):
+            advance(0.01)
+
+
+def main(ref="sun"):
+    n_1 = 5000
+    n_2 = 500000 - n_1
+    n_3 = 5000000 - n_2 - n_1
+    n_4 = 50000000 - n_3 - n_2 - n_1
+    file = open("result_python.csv", mode='w')
     offset_momentum(BODIES[ref])
     report_energy()
-    advance(0.01, n)
+    start = time.time()
+
+    write(n_1, True, SYSTEM)
+    print((time.time() - start) * 1000, "ms")
+    report_energy()
+
+    write(n_2, False, SYSTEM)
+    print((time.time() - start) * 1000, "ms")
+    report_energy()
+
+    write(n_3, False, SYSTEM)
+    print((time.time() - start) * 1000, "ms")
+    report_energy()
+
+    write(n_4, False, SYSTEM)
+    print((time.time() - start) * 1000, "ms")
     report_energy()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        main(int(sys.argv[1]))
-        sys.exit(0)
-    else:
-        print(f"This is {sys.argv[0]}")
-        print("Call this program with an integer as program argument")
-        print("(to set the number of iterations for the n-body simulation).")
-        sys.exit(1)
+    main()

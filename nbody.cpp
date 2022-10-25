@@ -243,20 +243,60 @@ body state[] = {
 };
 
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        std::cout << "This is " << argv[0] << std::endl;
-        std::cout << "Call this program with an integer as program argument" << std::endl;
-        std::cout << "(to set the number of iterations for the n-body simulation)." << std::endl;
-        return EXIT_FAILURE;
+#include <fstream>
+#include <time.h>
+
+time_t start, end;
+
+void write(int n, bool output) {
+    if (output == true) {
+        std::ofstream ofs;
+        ofs.open("result_cpp.csv", std::ios::out);
+        ofs << "name of the body;position x;position y;position z;step" << std::endl;
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < BODIES_COUNT; j++) {
+                ofs << state[j].name << ";" << state[j].position.x << ";" << state[j].position.y << ";"
+                    << state[j].position.z << ";" << i << std::endl;
+            }
+            advance(state, 0.01);
+        }
+        ofs.close();
     } else {
-        const unsigned int n = atoi(argv[1]);
-        offset_momentum(state);
-        std::cout << energy(state) << std::endl;
         for (int i = 0; i < n; ++i) {
             advance(state, 0.01);
         }
-        std::cout << energy(state) << std::endl;
-        return EXIT_SUCCESS;
     }
+}
+
+
+int main(int argc, char **argv) {
+    const unsigned int n_1 = 5000;
+    const unsigned int n_2 = 500000 - n_1;
+    const unsigned int n_3 = 5000000 - n_2 - n_1;
+    const unsigned int n_4 = 50000000 - n_3 - n_2 - n_1;
+    offset_momentum(state);
+    std::cout << energy(state) << std::endl;
+    start = clock();
+
+    write(n_1, true);
+    end = clock();
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << energy(state) << std::endl;
+
+    write(n_2, false);
+    end = clock();
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << energy(state) << std::endl;
+
+
+    write(n_3, false);
+    end = clock();
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << energy(state) << std::endl;
+
+    write(n_4, false);
+    end = clock();
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << energy(state) << std::endl;
+    return EXIT_SUCCESS;
 }
