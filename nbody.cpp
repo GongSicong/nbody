@@ -16,6 +16,7 @@
 */
 
 #define _USE_MATH_DEFINES // https://docs.microsoft.com/en-us/cpp/c-runtime-library/math-constants?view=msvc-160
+
 #include <cmath>
 #include <iostream>
 
@@ -280,23 +281,23 @@ int main(int argc, char **argv) {
 
     write(n_1, true);
     end = clock();
-    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h
     std::cout << energy(state) << std::endl;
 
     write(n_2, false);
     end = clock();
-    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h
     std::cout << energy(state) << std::endl;
 
 
     write(n_3, false);
     end = clock();
-    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h
     std::cout << energy(state) << std::endl;
 
     write(n_4, false);
     end = clock();
-    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h计时
+    std::cout << "running time: " << (end - start) << "ms" << std::endl;         // time.h
     std::cout << energy(state) << std::endl;
     return EXIT_SUCCESS;
 }
